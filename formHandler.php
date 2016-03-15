@@ -33,7 +33,8 @@ class FormHandler{
     private function handleForm(){
         // TODO: Handle forms - Ideally as dynamically as possible to avoid large if/switch blocks
         include "forms/" . $this->form . ".php"; // Include form
-        new Form($this);
+        $f = new Form($this);
+        $f->execute();
     }
 
     private function generateOutput(){
