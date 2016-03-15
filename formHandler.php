@@ -6,18 +6,20 @@ class FormHandler{
     var $data = array();
     var $err = array();
     var $forms = array("login", "signup");
+    var $form;
 
     function __construct(){
-        if($this->checkURL())
+        if($this->checkURL()){
             $this->handleForm();
+        }
         print $this->generateOutput();
     }
 
     private function checkURL(){
         if(isset($_REQUEST['q'])){
-            $q = $_REQUEST['q'];
-            if(in_array($q, $this->forms)){
-                $this->setData("q", $q);
+            $this->form = $_REQUEST['q'];
+            if(in_array($this->form, $this->forms)){
+                $this->setData("q", $this->form);
             } else {
                 $this->setError("q", "Invalid form selection");
             }
@@ -25,11 +27,13 @@ class FormHandler{
             $this->setError("q", "No form selected");
         }
 
-        return $this->errorsExist();
+        return !$this->errorsExist();
     }
 
     private function handleForm(){
         // TODO: Handle forms - Ideally as dynamically as possible to avoid large if/switch blocks
+        include "forms/" . $this->form . ".php"; // Include form
+        new Form($this);
     }
 
     private function generateOutput(){
@@ -42,15 +46,15 @@ class FormHandler{
         return json_encode($this->data);
     }
 
-    private function setData($name, $value){
+    public function setData($name, $value){
         $this->data[$name] = $value;
     }
 
-    private function setError($name, $value){
+    public function setError($name, $value){
         $this->err[$name] = $value;
     }
 
-    private function errorsExist(){
+    public function errorsExist(){
         return !empty($this->err);
     }
 
