@@ -2,11 +2,17 @@
 
 new FormHandler();
 
-class FormHandler{
+/**
+ *
+ * Entry point for form handling API
+ *
+ */
+class FormHandler {
     var $data = array();
     var $err = array();
-    var $forms = array("login", "signup");
-    var $form;
+    var $forms = array("login" => "login.php",
+                       "signup" => "signup.php");
+    var $formClassPath;
 
     function __construct(){
         if($this->checkURL()){
@@ -17,9 +23,10 @@ class FormHandler{
 
     private function checkURL(){
         if(isset($_REQUEST['q'])){
-            $this->form = $_REQUEST['q'];
-            if(in_array($this->form, $this->forms)){
-                $this->setData("q", $this->form);
+            $q = $_REQUEST['q'];
+            if(in_array($q, array_keys($this->forms))){
+                $this->setData("q", $q);
+                $this->formClassPath = $this->forms[$q];
             } else {
                 $this->setError("q", "Invalid form selection");
             }
@@ -30,9 +37,12 @@ class FormHandler{
         return !$this->errorsExist();
     }
 
+    /**
+     * Imports the associated class and proceeds with execution
+     */
     private function handleForm(){
-        // TODO: Handle forms - Ideally as dynamically as possible to avoid large if/switch blocks
-        include "forms/" . $this->form . ".php"; // Include form
+        // TODO: Error handling - invalid paths / class not existing
+        include "forms/" . $this->formClassPath;
         $f = new Form($this);
         $f->execute();
     }
